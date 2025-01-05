@@ -1,0 +1,310 @@
+diff --git a/scripts/gen_actor_source.py b/scripts/gen_actor_source.py
+index 8e0ffaf5..293734c9 100755
+--- a/scripts/gen_actor_source.py
++++ b/scripts/gen_actor_source.py
+@@ -1,4 +1,4 @@
+-#!/usr/bin/python
++#!/usr/bin/python3
+ # coding=utf-8
+ 
+ """
+@@ -403,15 +403,15 @@ class BaseType:
+             qualified_name = dict()
+             qualified_name["ascii"] = name
+             if name == "int":
+-                qualified_name["ru_RU"] = u"цел"
++                qualified_name["ru_RU"] = "цел"
+             elif name == "double":
+-                qualified_name["ru_RU"] = u"вещ"
++                qualified_name["ru_RU"] = "вещ"
+             elif name == "bool":
+-                qualified_name["ru_RU"] = u"лог"
++                qualified_name["ru_RU"] = "лог"
+             elif name == "char":
+-                qualified_name["ru_RU"] = u"сим"
++                qualified_name["ru_RU"] = "сим"
+             elif name == "string":
+-                qualified_name["ru_RU"] = u"лит"
++                qualified_name["ru_RU"] = "лит"
+             self._name = Name(qualified_name)
+             BaseType._typeTable[self._name.get_ascii_value()] = self
+ 
+@@ -727,14 +727,14 @@ class Argument:
+         """
+         result = ""
+         if self.constant and not self.readable:
+-            result += u"арг "
++            result += "арг "
+         elif self.readable and self.reference:
+-            result += u"аргрез "
++            result += "аргрез "
+         elif self.reference:
+-            result += u"рез "
++            result += "рез "
+         result += self.base_type.get_kumir_name()
+         if self.dimension > 0:
+-            result += u"таб"
++            result += "таб"
+         result += " " + self.name.get_kumir_value()
+         if self.dimension > 0:
+             result += "[" + "0:0," * (self.dimension - 1) + "0:0]"
+@@ -790,7 +790,7 @@ class Method:
+         rtype:      unicode
+         return:     Kumir header to be parsed by Kumir analizer as text program
+         """
+-        result = u"алг "
++        result = "алг "
+         if self.return_type is not None:
+             rtype = self.return_type
+             assert isinstance(rtype, BaseType)
+@@ -829,7 +829,7 @@ class Method:
+         else:
+             result += self.return_type.get_qt_name() + " "
+         result += class_name + "::run" + self.name.get_camel_case_cpp_value()
+-        body = u"/* алг " + kumir_return_type + self.name.get_kumir_value()
++        body = "/* алг " + kumir_return_type + self.name.get_kumir_value()
+         if self.arguments:
+             body += "("
+             for index, argument in enumerate(self.arguments):
+@@ -1669,9 +1669,9 @@ private:
+                 assert isinstance(argument, Argument)
+                 assert isinstance(argument.base_type, BaseType)
+                 body += "result.last().arguments.push_back(Shared::ActorInterface::Argument());\n"
+-                if argument.get_kumir_argument_declaration().startswith(u'аргрез '):
++                if argument.get_kumir_argument_declaration().startswith('аргрез '):
+                     body += "result.last().arguments.last().accessType = Shared::ActorInterface::InOutArgument;\n"
+-                elif argument.get_kumir_argument_declaration().startswith(u'рез '):
++                elif argument.get_kumir_argument_declaration().startswith('рез '):
+                     body += "result.last().arguments.last().accessType = Shared::ActorInterface::OutArgument;\n"
+                 else:
+                     body += "result.last().arguments.last().accessType = Shared::ActorInterface::InArgument;\n"
+diff --git a/scripts/get_bundle_name.py b/scripts/get_bundle_name.py
+index e77eebf4..05e1387f 100644
+--- a/scripts/get_bundle_name.py
++++ b/scripts/get_bundle_name.py
+@@ -9,13 +9,13 @@ if 3 == sys.version_info.major:
+     def to_str(x):
+         return x.decode("utf-8")
+ else:
+-    from urllib import unquote
++    from urllib.parse import unquote
+     def to_str(x):
+-        return unicode(x)
++        return str(x)
+ 
+ 
+ def get_version_information(top_level_dir):
+-    assert isinstance(top_level_dir, str) or isinstance(top_level_dir, unicode)
++    assert isinstance(top_level_dir, str) or isinstance(top_level_dir, str)
+     if os.path.exists(top_level_dir + os.path.sep + ".git"):
+         version_info = ""
+         try:
+diff --git a/scripts/project_spider.py b/scripts/project_spider.py
+index f988d309..0f8ae139 100644
+--- a/scripts/project_spider.py
++++ b/scripts/project_spider.py
+@@ -1,4 +1,4 @@
+-#!/usr/bin/env python
++#!/usr/bin/env python3
+ 
+ class ProjectModel:
+     
+@@ -150,11 +150,11 @@ def __scan_library(toplevel, specfilename):
+     target = basename[0:-8]
+     basename = basename.lower()[0:-8]
+     c.libs = [target]
+-    if spec.has_key("summary"):
++    if "summary" in spec:
+         c.summary = spec["summary"]
+-    if spec.has_key("description"):
++    if "description" in spec:
+         c.description = spec["description"]
+-    if spec.has_key("otherfiles"):
++    if "otherfiles" in spec:
+         c.filesmasks = spec["otherfiles"]
+     tsfiles = __translations_list(toplevel, target)
+     
+@@ -169,14 +169,14 @@ def __scan_library(toplevel, specfilename):
+ 
+ def __scan_plugin(toplevel, specfilename):
+     spec = __read_json(specfilename)
+-    if spec.has_key("nodeploy") and spec["nodeploy"]:
++    if "nodeploy" in spec and spec["nodeploy"]:
+         return None
+     c = Component()
+     c.name = "module-"+spec["name"]
+-    if spec.has_key("libexecs"):
++    if "libexecs" in spec:
+         c.libexecs = spec["libexecs"]
+-    if spec.has_key("requiresother"):
+-	c.requires_other = spec["requiresother"]
++    if "requiresother" in spec:
++        c.requires_other = spec["requiresother"]
+     srcdir = specfilename[len(toplevel)+5:]
+     if srcdir.startswith("actors"):
+         c.name = "actor-"
+@@ -191,19 +191,19 @@ def __scan_plugin(toplevel, specfilename):
+         basename = basename[5:]
+     profilename = dirr+"/"+basename+".pro"
+     c.plugins += [target]
+-    if spec.has_key("libs"):
++    if "libs" in spec:
+         c.requires_libs = spec["libs"]
+     if not "ExtensionSystem" in c.requires_libs:
+         c.requires_libs += ["ExtensionSystem"]
+-    if spec.has_key("requires"):
++    if "requires" in spec:
+         c.requires_kumir2 = spec["requires"]
+-    if spec.has_key("provides"):
++    if "provides" in spec:
+         c.provides = spec["provides"]
+-    if spec.has_key("summary"):
++    if "summary" in spec:
+         c.summary = spec["summary"]
+-    if spec.has_key("description"):
++    if "description" in spec:
+         c.description = spec["description"]
+-    if spec.has_key("otherfiles"):
++    if "otherfiles" in spec:
+         c.filemasks = spec["otherfiles"]
+     tsfiles = __translations_list(toplevel, target)
+     for ts in tsfiles:
+@@ -244,15 +244,15 @@ def __scan_application(toplevel, specfilename):
+     basename = basename.lower()[0:-8]
+     
+     c.bins += [target]
+-    if spec.has_key("win32_extradirs"):
++    if "win32_extradirs" in spec:
+         c.win32_extradirs = spec["win32_extradirs"]
+-    if spec.has_key("requires"):
++    if "requires" in spec:
+         c.requires_kumir2 = spec["requires"]
+-    if spec.has_key("webapps"):
++    if "webapps" in spec:
+         c.requires_web = spec["webapps"]
+     c.isconsole = spec["console"]
+     c.filesmasks += ["%bindir%/"+target]
+-    if spec.has_key("desktopfile"):
++    if "desktopfile" in spec:
+         c.desktopfiles += [spec["desktopfile"]]
+         c.filesmasks += ["%datadir%/applications/"+spec["desktopfile"]]
+         icon = __extract_icon_from_desktop_file(toplevel+"/"+spec["desktopfile"])
+@@ -263,9 +263,9 @@ def __scan_application(toplevel, specfilename):
+                 c.filesmasks += ["%datadir%/icons"+d+"/"+f]
+         c.icons += [icon]
+         c.dirs += ["%datadir%/applications"]
+-    if spec.has_key("summary"):
++    if "summary" in spec:
+         c.summary = spec["summary"]
+-    if spec.has_key("description"):
++    if "description" in spec:
+         c.description = spec["description"]
+     return c
+ 
+@@ -280,15 +280,15 @@ def __scan_webapplication(toplevel, specfilename):
+     c.dirs += ["%datadir%/kumir2/webapps/"+basename+"/"]
+     c.filesmasks += ["%datadir%/kumir2/webapps/"+basename+"/*"]
+     
+-    if spec.has_key("extrafiles"):
++    if "extrafiles" in spec:
+         extrafiles = spec["extrafiles"]
+         for ef in extrafiles:
+             if not ef["targetdir"] in c.dirs:
+                 c.dirs += [ef["targetdir"]]
+     c.isweb = True
+-    if spec.has_key("summary"):
++    if "summary" in spec:
+         c.summary = spec["summary"]
+-    if spec.has_key("description"):
++    if "description" in spec:
+         c.description = spec["description"]
+     return c
+ 
+@@ -348,7 +348,7 @@ def __merge_components(lst):
+     result = {}
+     for item in lst:
+         name = item.name
+-        if not result.has_key(name):
++        if name not in result:
+             result[name] = item
+         else:
+             c = result[name]
+diff --git a/scripts/read_disabled_modules.py b/scripts/read_disabled_modules.py
+index 46f9cd54..ff9593cb 100644
+--- a/scripts/read_disabled_modules.py
++++ b/scripts/read_disabled_modules.py
+@@ -7,7 +7,7 @@ import sys
+ 
+ 
+ def get_version_information(top_level_dir):
+-    assert isinstance(top_level_dir, str) or isinstance(top_level_dir, unicode)
++    assert isinstance(top_level_dir, str) or isinstance(top_level_dir, str)
+     if os.path.exists(top_level_dir + os.path.sep + ".git"):
+         try:
+             version_info = subprocess.check_output(
+diff --git a/scripts/update_translations.py b/scripts/update_translations.py
+index 37643177..9da2f2b2 100755
+--- a/scripts/update_translations.py
++++ b/scripts/update_translations.py
+@@ -1,4 +1,4 @@
+-#!/usr/bin/env python
++#!/usr/bin/env python3
+ 
+ TS_MODULES = {
+         "ExtensionSystem": "src/kumir2-libs/extensionsystem",
+diff --git a/src/kumir2-libs/errormessages/scanmessages.py b/src/kumir2-libs/errormessages/scanmessages.py
+index ea575b60..752a8f74 100644
+--- a/src/kumir2-libs/errormessages/scanmessages.py
++++ b/src/kumir2-libs/errormessages/scanmessages.py
+@@ -131,7 +131,7 @@ def readRules(filename):
+     if f is None:
+         return result
+     if sys.version_info.major < 3:
+-        lines = unicode(f.read(), 'utf-8').split('\n')
++        lines = f.read().split('\n')
+     else:
+         lines = f.read().split('\n')
+     f.close()
+@@ -214,7 +214,7 @@ def makeTable(database):
+     :returns:   CSV table contents
+     :rtype:     unicode
+     """
+-    result = u'"Key";'
++    result = '"Key";'
+     for lang in database.keys():
+         if len(lang) > 0:
+             result += '"%s";' % lang
+@@ -277,7 +277,7 @@ if __name__ == "__main__":
+ 
+     db_file = open(db_file_name, 'r', encoding="utf-8")
+     if sys.version_info.major < 3:
+-        source_csv_contents = unicode(db_file.read(), 'utf-8')
++        source_csv_contents = db_file.read()
+     else:
+         source_csv_contents = db_file.read()
+     db_file.close()
+diff --git a/src/kumir2-libs/stdlib/table_generator.py b/src/kumir2-libs/stdlib/table_generator.py
+index f6e2376a..58d49b07 100644
+--- a/src/kumir2-libs/stdlib/table_generator.py
++++ b/src/kumir2-libs/stdlib/table_generator.py
+@@ -1,4 +1,4 @@
+-#!/usr/bin/python2.7
++#!/usr/bin/python3
+ #encoding=utf-8
+ 
+ TABLES = ["cp866", "koi8-r", "windows-1251"]
+@@ -8,9 +8,9 @@ for table in TABLES:
+     ualph = []
+     for elem in alph:
+         try:
+-            symbol = unicode(elem, table)
++            symbol = elem.encode(table)
+         except:
+-            symbol = u"\0"
++            symbol = "\0"
+         ualph += [symbol]
+ 
+     ucodes = map(lambda x: ord(x), ualph)
+-- 
+2.25.2
+
