@@ -35,7 +35,7 @@ RDEPEND="
 	x11-libs/libXrandr
 "
 
-SIMPLE_NAME="Idea Ultimate"
+SIMPLE_NAME="IntelliJ IDEA Ultimate"
 MY_PN="idea"
 SRC_URI_PATH="idea"
 SRC_URI_PN="ideaIU"
